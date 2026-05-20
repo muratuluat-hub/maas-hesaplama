@@ -5,38 +5,618 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Net Ücret ve Brüt Ücret Maaş Hesaplama</title>
   <style>
-    :root{--bg:#f6f7f9;--panel:#fff;--ink:#17202a;--muted:#667085;--line:#d9dee7;--accent:#0f766e;--soft:#eef8f6;--warn:#8a5a00;--warn-soft:#fff6dc;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);line-height:1.45}main{max-width:1180px;margin:0 auto;padding:28px 18px 56px}header{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:18px;margin-bottom:18px}h1{margin:0;font-size:28px;line-height:1.15;letter-spacing:0}.subhead{margin:8px 0 0;color:var(--muted);max-width:720px}.badge,.input-band,section,.metric{background:var(--panel);border:1px solid var(--line)}.badge{border-radius:999px;color:var(--muted);padding:8px 12px;font-size:13px;white-space:nowrap}.input-band,section{border-radius:8px;box-shadow:0 16px 40px rgba(20,31,43,.06)}.input-band{padding:18px;margin-bottom:18px}form{display:grid;grid-template-columns:minmax(220px,1fr) minmax(210px,260px) auto;gap:14px;align-items:end}label{display:block;color:#344054;font-size:13px;font-weight:700;margin-bottom:6px}input[type=text]{width:100%;min-height:46px;border:1px solid #cbd5e1;border-radius:6px;padding:10px 12px;color:var(--ink);font:inherit;font-size:18px;background:#fff}input[type=text]:focus{outline:3px solid rgba(15,118,110,.16);border-color:var(--accent)}.segmented{display:grid;grid-template-columns:1fr 1fr;border:1px solid #cbd5e1;border-radius:6px;overflow:hidden;min-height:46px;background:#fff}.segmented input{position:absolute;opacity:0;pointer-events:none}.segmented label{margin:0;display:grid;place-items:center;padding:10px;cursor:pointer;color:#475467;border-right:1px solid #cbd5e1}.segmented label:last-child{border-right:0}.segmented input:checked+span{color:#fff;background:var(--accent)}.segmented span{width:100%;height:100%;display:grid;place-items:center;border-radius:4px;font-weight:800}button{min-height:46px;border:0;border-radius:6px;padding:0 18px;font:inherit;font-weight:800;color:#fff;background:var(--accent);cursor:pointer}.assumptions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;color:var(--muted);font-size:13px}.assumptions span{border:1px solid #dce3ec;border-radius:999px;padding:6px 10px;background:#fbfcfe}details{margin-top:14px;border:1px solid #dce3ec;border-radius:6px;background:#fbfcfe;padding:12px}summary{cursor:pointer;font-weight:850;color:#344054}.helper{margin:8px 0 0;color:var(--muted);font-size:13px}.param-grid{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:12px;margin-top:14px}.param-grid input[type=text]{min-height:40px;font-size:15px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}.metric{border-radius:8px;padding:16px}.metric .label{color:var(--muted);font-size:13px;font-weight:700}.metric .value{margin-top:6px;font-size:24px;font-weight:850;letter-spacing:0}section{padding:18px;margin-bottom:18px}h2{margin:0 0 12px;font-size:18px;letter-spacing:0}.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px}.lines{display:grid;gap:8px}.line{display:flex;justify-content:space-between;gap:16px;border-bottom:1px solid #edf0f4;padding-bottom:8px}.line span:first-child{color:var(--muted)}.line strong{text-align:right;white-space:nowrap}.journal{background:#fbfcfe;border:1px solid #dce3ec;border-radius:6px;padding:12px;overflow-x:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;font-size:13px;white-space:pre}.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:6px}table{width:100%;border-collapse:collapse;min-width:900px;background:#fff}th,td{padding:10px 12px;border-bottom:1px solid #edf0f4;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}th{position:sticky;top:0;background:#f9fafb;color:#475467;font-size:12px;text-transform:uppercase;letter-spacing:0}th:first-child,td:first-child{text-align:left}tbody tr:hover{background:var(--soft)}tfoot td{background:#f4faf8;border-top:2px solid var(--accent);font-weight:850}.notice{margin-top:12px;background:var(--warn-soft);color:var(--warn);border:1px solid #f2d47c;border-radius:6px;padding:10px 12px;font-size:13px}@media(max-width:860px){form,.grid,.two-col,.param-grid{grid-template-columns:1fr}h1{font-size:24px}.metric .value{font-size:21px}}
+    :root {
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --ink: #17202a;
+      --muted: #667085;
+      --line: #d9dee7;
+      --accent: #0f766e;
+      --accent-dark: #115e59;
+      --soft: #eef8f6;
+      --warn: #8a5a00;
+      --warn-soft: #fff6dc;
+      --radius: 8px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.45;
+    }
+
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 18px 56px;
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    .subhead {
+      margin: 8px 0 0;
+      color: var(--muted);
+      max-width: 720px;
+    }
+
+    .badge {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 999px;
+      color: var(--muted);
+      padding: 8px 12px;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .input-band,
+    section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 16px 40px rgba(20, 31, 43, 0.06);
+    }
+
+    .input-band {
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) minmax(210px, 260px) auto;
+      gap: 14px;
+      align-items: end;
+    }
+
+    label {
+      display: block;
+      color: #344054;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 10px 12px;
+      color: var(--ink);
+      font: inherit;
+      font-size: 18px;
+      background: #fff;
+    }
+
+    input[type="text"]:focus {
+      outline: 3px solid rgba(15, 118, 110, 0.16);
+      border-color: var(--accent);
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      overflow: hidden;
+      min-height: 46px;
+      background: #fff;
+    }
+
+    .segmented input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .segmented label {
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 10px;
+      cursor: pointer;
+      color: #475467;
+      border-right: 1px solid #cbd5e1;
+    }
+
+    .segmented label:last-child { border-right: 0; }
+
+    .segmented input:checked + span {
+      color: #fff;
+      background: var(--accent);
+    }
+
+    .segmented span {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      border-radius: 4px;
+      font-weight: 800;
+    }
+
+    button {
+      min-height: 46px;
+      border: 0;
+      border-radius: 6px;
+      padding: 0 18px;
+      font: inherit;
+      font-weight: 800;
+      color: #fff;
+      background: var(--accent);
+      cursor: pointer;
+    }
+
+    button:hover { background: var(--accent-dark); }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .secondary-button {
+      min-height: 40px;
+      color: var(--accent-dark);
+      background: #e8f5f2;
+      border: 1px solid #b8dcd5;
+    }
+
+    .secondary-button:hover { background: #d9eee9; }
+
+    .assumptions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .assumptions span {
+      border: 1px solid #dce3ec;
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: #fbfcfe;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .metric {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+
+    .metric .label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .metric .value {
+      margin-top: 6px;
+      font-size: 24px;
+      font-weight: 850;
+      letter-spacing: 0;
+    }
+
+    section {
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .lines { display: grid; gap: 8px; }
+
+    .line {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 1px solid #edf0f4;
+      padding-bottom: 8px;
+    }
+
+    .line span:first-child { color: var(--muted); }
+    .line strong { text-align: right; white-space: nowrap; }
+
+    .journal {
+      background: #fbfcfe;
+      border: 1px solid #dce3ec;
+      border-radius: 6px;
+      padding: 12px;
+      overflow-x: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+      white-space: pre;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+      background: #fff;
+    }
+
+    th,
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #edf0f4;
+      text-align: right;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #f9fafb;
+      color: #475467;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    th:first-child,
+    td:first-child { text-align: left; }
+    tbody tr:hover { background: var(--soft); }
+
+    tfoot td {
+      background: #f4faf8;
+      border-top: 2px solid var(--accent);
+      font-weight: 850;
+    }
+
+    .notice {
+      margin-top: 12px;
+      background: var(--warn-soft);
+      color: var(--warn);
+      border: 1px solid #f2d47c;
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 860px) {
+      form,
+      .grid,
+      .two-col { grid-template-columns: 1fr; }
+      h1 { font-size: 24px; }
+      .metric .value { font-size: 21px; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      main { max-width: none; padding: 0; }
+      .input-band,
+      .actions,
+      .notice { display: none; }
+      header,
+      section,
+      .metric { box-shadow: none; }
+      table { min-width: 0; }
+    }
   </style>
 </head>
 <body>
   <main>
-    <header><div><h1>Net Ücret ve Brüt Ücret Maaş Hesaplama</h1><p class="subhead">Aylık ücreti girin, net mi brüt mü olduğunu seçin; hesaplama 12 ay boyunca kümülatif gelir vergisini dikkate alır.</p></div><div class="badge">2026 Türkiye bordro parametreleri</div></header>
+    <header>
+      <div>
+        <h1>Net Ücret ve Brüt Ücret Maaş Hesaplama</h1>
+        <p class="subhead">Aylık ücreti girin, net mi brüt mü olduğunu seçin; hesaplama 12 ay boyunca kümülatif gelir vergisini dikkate alır.</p>
+      </div>
+      <div class="badge">2026 Türkiye bordro parametreleri</div>
+    </header>
+
     <div class="input-band">
-      <form id="salary-form"><div><label for="amount">Aylık ücret</label><input id="amount" inputmode="decimal" type="text" value="100.000" autocomplete="off"></div><div><label>Ücret türü</label><div class="segmented" role="radiogroup" aria-label="Ücret türü"><label><input type="radio" name="salaryType" value="gross" checked><span>Brüt</span></label><label><input type="radio" name="salaryType" value="net"><span>Net</span></label></div></div><button type="submit">Hesapla</button></form>
-      <div class="assumptions"><span id="badge-employee-sgk">SGK işçi %14</span><span id="badge-employee-unemployment">İşsizlik işçi %1</span><span id="badge-employer-sgk">SGK işveren %19,75</span><span id="badge-employer-unemployment">İşsizlik işveren %2</span><span id="badge-stamp">Damga vergisi binde 7,59</span><span id="badge-ceiling">SGK tavan 297.270 TL</span></div>
-      <details><summary>2027 ve diğer yıllar için parametreleri değiştir</summary><p class="helper">Yeni yıl rakamları belli olduğunda bu alanları güncelle. Gelir vergisi dilimlerini virgülle, oranları yüzde olarak yaz.</p><div class="param-grid"><div><label for="minimum-gross">Brüt asgari ücret</label><input id="minimum-gross" class="param-money" type="text" value="33.030"></div><div><label for="sgk-floor">SGK taban</label><input id="sgk-floor" class="param-money" type="text" value="33.030"></div><div><label for="sgk-ceiling">SGK tavan</label><input id="sgk-ceiling" class="param-money" type="text" value="297.270"></div><div><label for="stamp-rate">Damga vergisi binde</label><input id="stamp-rate" type="text" value="7,59"></div><div><label for="employee-sgk-rate">SGK işçi %</label><input id="employee-sgk-rate" type="text" value="14"></div><div><label for="employee-unemployment-rate">İşsizlik işçi %</label><input id="employee-unemployment-rate" type="text" value="1"></div><div><label for="employer-sgk-rate">SGK işveren %</label><input id="employer-sgk-rate" type="text" value="19,75"></div><div><label for="employer-unemployment-rate">İşsizlik işveren %</label><input id="employer-unemployment-rate" type="text" value="2"></div><div><label for="tax-limits">GV dilimleri</label><input id="tax-limits" type="text" value="190.000, 400.000, 1.500.000, 5.300.000"></div><div><label for="tax-rates">GV oranları %</label><input id="tax-rates" type="text" value="15, 20, 27, 35, 40"></div></div></details>
+      <form id="salary-form">
+        <div>
+          <label for="amount">Aylık ücret</label>
+          <input id="amount" inputmode="decimal" type="text" value="100.000" autocomplete="off">
+        </div>
+        <div>
+          <label>Ücret türü</label>
+          <div class="segmented" role="radiogroup" aria-label="Ücret türü">
+            <label><input type="radio" name="salaryType" value="gross" checked><span>Brüt</span></label>
+            <label><input type="radio" name="salaryType" value="net"><span>Net</span></label>
+          </div>
+        </div>
+        <button type="submit">Hesapla</button>
+      </form>
+      <div class="assumptions">
+        <span id="badge-employee-sgk">SGK işçi %14</span>
+        <span id="badge-employee-unemployment">İşsizlik işçi %1</span>
+        <span id="badge-employer-sgk">SGK işveren %19,75</span>
+        <span id="badge-employer-unemployment">İşsizlik işveren %2</span>
+        <span id="badge-stamp">Damga vergisi binde 7,59</span>
+        <span id="badge-ceiling">SGK tavan 297.270 TL</span>
+      </div>
+      <div class="actions">
+        <button class="secondary-button" id="print-button" type="button">PDF / Yazdır</button>
+        <button class="secondary-button" id="excel-button" type="button">Excel'e Aktar</button>
+      </div>
     </div>
-    <div class="grid"><div class="metric"><div class="label" id="primary-label">1. Ay Net Ücret</div><div class="value" id="primary-value">-</div></div><div class="metric"><div class="label">1. Ay İşveren Maliyeti</div><div class="value" id="monthly-cost">-</div></div><div class="metric"><div class="label">Yıllık İşveren Maliyeti</div><div class="value" id="annual-cost">-</div></div></div>
+
+    <div class="grid">
+      <div class="metric"><div class="label" id="primary-label">1. Ay Net Ücret</div><div class="value" id="primary-value">-</div></div>
+      <div class="metric"><div class="label">1. Ay İşveren Maliyeti</div><div class="value" id="monthly-cost">-</div></div>
+      <div class="metric"><div class="label">Yıllık İşveren Maliyeti</div><div class="value" id="annual-cost">-</div></div>
+    </div>
+
     <section><h2>1. Ay Maliyeti ve Muhasebe Kaydı</h2><div class="two-col"><div class="lines" id="monthly-lines"></div><pre class="journal" id="monthly-journal"></pre></div></section>
     <section><h2>Yıllık Maliyet ve Muhasebe Kaydı</h2><div class="two-col"><div class="lines" id="annual-lines"></div><pre class="journal" id="annual-journal"></pre></div></section>
-    <section><h2>12 Aylık Maaş Tablosu</h2><div class="table-wrap"><table><thead><tr><th>Ay</th><th>Brüt Ücret</th><th>Net Ücret</th><th>Gelir Vergisi</th><th>Damga Vergisi</th><th>İşveren Payı</th><th>İşveren Maliyeti</th></tr></thead><tbody id="salary-table"></tbody><tfoot id="salary-totals"></tfoot></table></div><div class="notice">Kuruş farkları bordro programlarının yuvarlama yöntemlerine göre değişebilir. 2027 için parametre panelindeki asgari ücret, SGK taban/tavan ve gelir vergisi dilimlerini güncellemeniz yeterlidir.</div></section>
+    <section>
+      <h2>12 Aylık Maaş Tablosu</h2>
+      <div class="table-wrap"><table><thead><tr><th>Ay</th><th>Brüt Ücret</th><th>Net Ücret</th><th>Gelir Vergisi</th><th>Damga Vergisi</th><th>İşveren Payı</th><th>İşveren Maliyeti</th></tr></thead><tbody id="salary-table"></tbody><tfoot id="salary-totals"></tfoot></table></div>
+      <div class="notice">Kuruş farkları bordro programlarının yuvarlama yöntemlerine göre değişebilir. Yeni yıl parametreleri sistem güncellemesiyle yenilenir.</div>
+    </section>
   </main>
+
   <script>
-    const formatMoney=v=>v.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2})+' TL';
-    const parseMoney=v=>{const n=Number(String(v).replace(/\s/g,'').replace(/\./g,'').replace(',','.'));return Number.isFinite(n)?n:0};
-    const parseRate=v=>parseMoney(v)/100;
-    const parseList=v=>String(v).split(',').map(parseMoney).filter(n=>Number.isFinite(n)&&n>0);
-    const readParams=()=>({minGross:parseMoney(document.querySelector('#minimum-gross').value),sgkFloor:parseMoney(document.querySelector('#sgk-floor').value),sgkCeiling:parseMoney(document.querySelector('#sgk-ceiling').value),stampRate:parseMoney(document.querySelector('#stamp-rate').value)/1000,employeeSgkRate:parseRate(document.querySelector('#employee-sgk-rate').value),employeeUnemploymentRate:parseRate(document.querySelector('#employee-unemployment-rate').value),employerSgkRate:parseRate(document.querySelector('#employer-sgk-rate').value),employerUnemploymentRate:parseRate(document.querySelector('#employer-unemployment-rate').value),taxLimits:parseList(document.querySelector('#tax-limits').value),taxRates:parseList(document.querySelector('#tax-rates').value).map(r=>r/100)});
-    const taxWage=(base,p)=>{let tax=0,prev=0;for(let i=0;i<p.taxRates.length;i++){const lim=p.taxLimits[i]??Infinity;const part=Math.max(0,Math.min(base,lim)-prev);tax+=part*p.taxRates[i];if(base<=lim)return tax;prev=lim}return tax};
-    const sgkBaseFor=(gross,p)=>Math.min(Math.max(gross,p.sgkFloor||0),p.sgkCeiling||gross);
-    const calcGross=(gross,prevBase,prevMin,p)=>{const sgkBase=sgkBaseFor(gross,p);const employeeSgk=sgkBase*p.employeeSgkRate;const employeeUnemployment=sgkBase*p.employeeUnemploymentRate;const taxBase=gross-employeeSgk-employeeUnemployment;const minSgkBase=sgkBaseFor(p.minGross,p);const minTaxBase=p.minGross-minSgkBase*p.employeeSgkRate-minSgkBase*p.employeeUnemploymentRate;const grossTax=taxWage(prevBase+taxBase,p)-taxWage(prevBase,p);const minTax=taxWage(prevMin+minTaxBase,p)-taxWage(prevMin,p);const incomeTax=Math.max(0,grossTax-minTax);const stampTax=Math.max(0,(gross-p.minGross)*p.stampRate);const net=gross-employeeSgk-employeeUnemployment-incomeTax-stampTax;const employerSgk=sgkBase*p.employerSgkRate;const employerUnemployment=sgkBase*p.employerUnemploymentRate;const employerShare=employerSgk+employerUnemployment;const employerCost=gross+employerShare;return{gross,socialSecurityBase:sgkBase,employeeSgk,employeeUnemployment,taxBase,incomeTax,stampTax,net,employerSgk,employerUnemployment,employerShare,employerCost,taxPayable:incomeTax+stampTax,socialSecurityPayable:employeeSgk+employeeUnemployment+employerShare}};
-    const solveNet=(target,prevBase,prevMin,p)=>{let lo=0,hi=Math.max(target*2.4,p.minGross);while(calcGross(hi,prevBase,prevMin,p).net<target)hi*=1.5;for(let i=0;i<90;i++){const mid=(lo+hi)/2;if(calcGross(mid,prevBase,prevMin,p).net<target)lo=mid;else hi=mid}return calcGross((lo+hi)/2,prevBase,prevMin,p)};
-    const calcYear=(amount,type,p)=>{const minSgkBase=sgkBaseFor(p.minGross,p);const minTaxBase=p.minGross-minSgkBase*p.employeeSgkRate-minSgkBase*p.employeeUnemploymentRate;let prevBase=0,prevMin=0;const rows=[];for(let month=1;month<=12;month++){const row=type==='net'?solveNet(amount,prevBase,prevMin,p):calcGross(amount,prevBase,prevMin,p);row.month=month;row.cumulativeTaxBase=prevBase+row.taxBase;rows.push(row);prevBase+=row.taxBase;prevMin+=minTaxBase}const totals=rows.reduce((a,r)=>{Object.keys(r).forEach(k=>{if(typeof r[k]==='number')a[k]=(a[k]||0)+r[k]});return a},{});return{rows,totals}};
-    const line=(label,value)=>`<div class="line"><span>${label}</span><strong>${formatMoney(value)}</strong></div>`;
-    const monthlyJournal=r=>['Borç',`770 Genel Yönetim Giderleri        ${formatMoney(r.employerCost)}`,'','Alacak',`335 Personele Borçlar              ${formatMoney(r.net)}`,`360 Ödenecek Vergi ve Fonlar       ${formatMoney(r.taxPayable)}`,`    360.01 Gelir Vergisi           ${formatMoney(r.incomeTax)}`,`    360.02 Damga Vergisi           ${formatMoney(r.stampTax)}`,`361 Ödenecek SGK Kesintileri       ${formatMoney(r.socialSecurityPayable)}`,`    361.01 SGK İşçi                ${formatMoney(r.employeeSgk)}`,`    361.02 İşsizlik İşçi           ${formatMoney(r.employeeUnemployment)}`,`    361.03 SGK İşveren             ${formatMoney(r.employerSgk)}`,`    361.04 İşsizlik İşveren        ${formatMoney(r.employerUnemployment)}`].join('\n');
-    const annualJournal=t=>['Borç',`770 Genel Yönetim Giderleri        ${formatMoney(t.employerCost)}`,'','Alacak',`335 Personele Borçlar              ${formatMoney(t.net)}`,`360 Ödenecek Vergi ve Fonlar       ${formatMoney(t.taxPayable)}`,`361 Ödenecek SGK Kesintileri       ${formatMoney(t.socialSecurityPayable)}`].join('\n');
-    const render=()=>{const amount=parseMoney(document.querySelector('#amount').value);const type=document.querySelector('input[name="salaryType"]:checked').value;const p=readParams();const {rows,totals}=calcYear(amount,type,p);const first=rows[0];document.querySelector('#badge-employee-sgk').textContent=`SGK işçi %${(p.employeeSgkRate*100).toLocaleString('tr-TR')}`;document.querySelector('#badge-employee-unemployment').textContent=`İşsizlik işçi %${(p.employeeUnemploymentRate*100).toLocaleString('tr-TR')}`;document.querySelector('#badge-employer-sgk').textContent=`SGK işveren %${(p.employerSgkRate*100).toLocaleString('tr-TR')}`;document.querySelector('#badge-employer-unemployment').textContent=`İşsizlik işveren %${(p.employerUnemploymentRate*100).toLocaleString('tr-TR')}`;document.querySelector('#badge-stamp').textContent=`Damga vergisi binde ${(p.stampRate*1000).toLocaleString('tr-TR')}`;document.querySelector('#badge-ceiling').textContent=`SGK tavan ${formatMoney(p.sgkCeiling).replace(' TL','')} TL`;document.querySelector('#primary-label').textContent=type==='net'?'1. Ay Brüt Ücret':'1. Ay Net Ücret';document.querySelector('#primary-value').textContent=formatMoney(type==='net'?first.gross:first.net);document.querySelector('#monthly-cost').textContent=formatMoney(first.employerCost);document.querySelector('#annual-cost').textContent=formatMoney(totals.employerCost);document.querySelector('#monthly-lines').innerHTML=[line('Brüt ücret',first.gross),line('Net ücret',first.net),line('SGK işçi primi',first.employeeSgk),line('İşsizlik işçi primi',first.employeeUnemployment),line('Gelir vergisi',first.incomeTax),line('Damga vergisi',first.stampTax),line('İşveren payı',first.employerShare),line('1. ay işveren maliyeti',first.employerCost)].join('');document.querySelector('#annual-lines').innerHTML=[line('Yıllık brüt ücret',totals.gross),line('Yıllık net ücret',totals.net),line('Yıllık gelir vergisi',totals.incomeTax),line('Yıllık damga vergisi',totals.stampTax),line('Yıllık işveren payı',totals.employerShare),line('Yıllık işveren maliyeti',totals.employerCost)].join('');document.querySelector('#monthly-journal').textContent=monthlyJournal(first);document.querySelector('#annual-journal').textContent=annualJournal(totals);document.querySelector('#salary-table').innerHTML=rows.map(r=>`<tr><td>${r.month}</td><td>${formatMoney(r.gross)}</td><td>${formatMoney(r.net)}</td><td>${formatMoney(r.incomeTax)}</td><td>${formatMoney(r.stampTax)}</td><td>${formatMoney(r.employerShare)}</td><td>${formatMoney(r.employerCost)}</td></tr>`).join('');document.querySelector('#salary-totals').innerHTML=`<tr><td>Toplam</td><td>${formatMoney(totals.gross)}</td><td>${formatMoney(totals.net)}</td><td>${formatMoney(totals.incomeTax)}</td><td>${formatMoney(totals.stampTax)}</td><td>${formatMoney(totals.employerShare)}</td><td>${formatMoney(totals.employerCost)}</td></tr>`};
-    document.querySelector('#salary-form').addEventListener('submit',e=>{e.preventDefault();render()});document.querySelectorAll('input[name="salaryType"]').forEach(i=>i.addEventListener('change',render));document.querySelector('#amount').addEventListener('blur',e=>{const a=parseMoney(e.target.value);e.target.value=a?a.toLocaleString('tr-TR'):''});document.querySelectorAll('details input').forEach(i=>i.addEventListener('change',render));document.querySelectorAll('.param-money').forEach(i=>i.addEventListener('blur',e=>{const a=parseMoney(e.target.value);e.target.value=a?a.toLocaleString('tr-TR'):''}));render();
+    const formatMoney = (value) => value.toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " TL";
+    const parseMoney = (value) => {
+      const normalized = String(value).replace(/\s/g, "").replace(/\./g, "").replace(",", ".");
+      const amount = Number(normalized);
+      return Number.isFinite(amount) ? amount : 0;
+    };
+
+    const PARAMS = {
+      minGross: 33030,
+      sgkFloor: 33030,
+      sgkCeiling: 297270,
+      stampRate: 0.00759,
+      employeeSgkRate: 0.14,
+      employeeUnemploymentRate: 0.01,
+      employerSgkRate: 0.1975,
+      employerUnemploymentRate: 0.02,
+      taxLimits: [190000, 400000, 1500000, 5300000],
+      taxRates: [0.15, 0.20, 0.27, 0.35, 0.40]
+    };
+
+    let latestResult = null;
+
+    const taxWage = (base, params) => {
+      let tax = 0;
+      let previousLimit = 0;
+      for (let index = 0; index < params.taxRates.length; index += 1) {
+        const currentLimit = params.taxLimits[index] ?? Infinity;
+        const taxablePart = Math.max(0, Math.min(base, currentLimit) - previousLimit);
+        tax += taxablePart * params.taxRates[index];
+        if (base <= currentLimit) return tax;
+        previousLimit = currentLimit;
+      }
+      return tax;
+    };
+
+    const sgkBaseFor = (gross, params) => Math.min(Math.max(gross, params.sgkFloor || 0), params.sgkCeiling || gross);
+
+    const calculateMonthFromGross = (gross, previousTaxBase, previousMinimumBase, params) => {
+      const socialSecurityBase = sgkBaseFor(gross, params);
+      const employeeSgk = socialSecurityBase * params.employeeSgkRate;
+      const employeeUnemployment = socialSecurityBase * params.employeeUnemploymentRate;
+      const taxBase = gross - employeeSgk - employeeUnemployment;
+      const minimumSocialSecurityBase = sgkBaseFor(params.minGross, params);
+      const minTaxBase = params.minGross - (minimumSocialSecurityBase * params.employeeSgkRate) - (minimumSocialSecurityBase * params.employeeUnemploymentRate);
+      const grossIncomeTax = taxWage(previousTaxBase + taxBase, params) - taxWage(previousTaxBase, params);
+      const minimumIncomeTax = taxWage(previousMinimumBase + minTaxBase, params) - taxWage(previousMinimumBase, params);
+      const incomeTax = Math.max(0, grossIncomeTax - minimumIncomeTax);
+      const stampTax = Math.max(0, (gross - params.minGross) * params.stampRate);
+      const net = gross - employeeSgk - employeeUnemployment - incomeTax - stampTax;
+      const employerSgk = socialSecurityBase * params.employerSgkRate;
+      const employerUnemployment = socialSecurityBase * params.employerUnemploymentRate;
+      const employerShare = employerSgk + employerUnemployment;
+      const employerCost = gross + employerShare;
+
+      return { gross, socialSecurityBase, employeeSgk, employeeUnemployment, taxBase, incomeTax, stampTax, net, employerSgk, employerUnemployment, employerShare, employerCost, taxPayable: incomeTax + stampTax, socialSecurityPayable: employeeSgk + employeeUnemployment + employerShare };
+    };
+
+    const solveGrossForNet = (targetNet, previousTaxBase, previousMinimumBase, params) => {
+      let low = 0;
+      let high = Math.max(targetNet * 2.4, params.minGross);
+      while (calculateMonthFromGross(high, previousTaxBase, previousMinimumBase, params).net < targetNet) high *= 1.5;
+      for (let i = 0; i < 90; i += 1) {
+        const mid = (low + high) / 2;
+        const result = calculateMonthFromGross(mid, previousTaxBase, previousMinimumBase, params);
+        if (result.net < targetNet) low = mid;
+        else high = mid;
+      }
+      return calculateMonthFromGross((low + high) / 2, previousTaxBase, previousMinimumBase, params);
+    };
+
+    const calculateYear = (amount, type, params) => {
+      const minimumSocialSecurityBase = sgkBaseFor(params.minGross, params);
+      const minTaxBase = params.minGross - (minimumSocialSecurityBase * params.employeeSgkRate) - (minimumSocialSecurityBase * params.employeeUnemploymentRate);
+      let previousTaxBase = 0;
+      let previousMinimumBase = 0;
+      const rows = [];
+      for (let month = 1; month <= 12; month += 1) {
+        const row = type === "net" ? solveGrossForNet(amount, previousTaxBase, previousMinimumBase, params) : calculateMonthFromGross(amount, previousTaxBase, previousMinimumBase, params);
+        row.month = month;
+        row.cumulativeTaxBase = previousTaxBase + row.taxBase;
+        rows.push(row);
+        previousTaxBase += row.taxBase;
+        previousMinimumBase += minTaxBase;
+      }
+      const totals = rows.reduce((acc, row) => {
+        Object.keys(row).forEach((key) => {
+          if (typeof row[key] === "number") acc[key] = (acc[key] || 0) + row[key];
+        });
+        return acc;
+      }, {});
+      return { rows, totals };
+    };
+
+    const line = (label, value) => `<div class="line"><span>${label}</span><strong>${formatMoney(value)}</strong></div>`;
+
+    const buildMonthlyJournal = (row) => [
+      "Borç",
+      `770 Genel Yönetim Giderleri        ${formatMoney(row.employerCost)}`,
+      "",
+      "Alacak",
+      `335 Personele Borçlar              ${formatMoney(row.net)}`,
+      `360 Ödenecek Vergi ve Fonlar       ${formatMoney(row.taxPayable)}`,
+      `    360.01 Gelir Vergisi           ${formatMoney(row.incomeTax)}`,
+      `    360.02 Damga Vergisi           ${formatMoney(row.stampTax)}`,
+      `361 Ödenecek SGK Kesintileri       ${formatMoney(row.socialSecurityPayable)}`,
+      `    361.01 SGK İşçi                ${formatMoney(row.employeeSgk)}`,
+      `    361.02 İşsizlik İşçi           ${formatMoney(row.employeeUnemployment)}`,
+      `    361.03 SGK İşveren             ${formatMoney(row.employerSgk)}`,
+      `    361.04 İşsizlik İşveren        ${formatMoney(row.employerUnemployment)}`
+    ].join("\n");
+
+    const buildAnnualJournal = (totals) => [
+      "Borç",
+      `770 Genel Yönetim Giderleri        ${formatMoney(totals.employerCost)}`,
+      "",
+      "Alacak",
+      `335 Personele Borçlar              ${formatMoney(totals.net)}`,
+      `360 Ödenecek Vergi ve Fonlar       ${formatMoney(totals.taxPayable)}`,
+      `361 Ödenecek SGK Kesintileri       ${formatMoney(totals.socialSecurityPayable)}`
+    ].join("\n");
+
+    const csvValue = (value) => `"${String(value).replace(/"/g, '""')}"`;
+
+    const exportCsv = () => {
+      if (!latestResult) return;
+      const rows = [
+        ["Ay", "Brüt Ücret", "Net Ücret", "Gelir Vergisi", "Damga Vergisi", "İşveren Payı", "İşveren Maliyeti"],
+        ...latestResult.rows.map((row) => [row.month, row.gross, row.net, row.incomeTax, row.stampTax, row.employerShare, row.employerCost]),
+        ["Toplam", latestResult.totals.gross, latestResult.totals.net, latestResult.totals.incomeTax, latestResult.totals.stampTax, latestResult.totals.employerShare, latestResult.totals.employerCost]
+      ];
+      const csv = rows.map((row) => row.map((cell) => {
+        if (typeof cell === "number") return csvValue(cell.toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+        return csvValue(cell);
+      }).join(";")).join("\n");
+      const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "maas-hesaplama.csv";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    };
+
+    const render = () => {
+      const amount = parseMoney(document.querySelector("#amount").value);
+      const type = document.querySelector("input[name='salaryType']:checked").value;
+      const params = PARAMS;
+      const { rows, totals } = calculateYear(amount, type, params);
+      const first = rows[0];
+      latestResult = { rows, totals };
+
+      document.querySelector("#badge-employee-sgk").textContent = `SGK işçi %${(params.employeeSgkRate * 100).toLocaleString("tr-TR")}`;
+      document.querySelector("#badge-employee-unemployment").textContent = `İşsizlik işçi %${(params.employeeUnemploymentRate * 100).toLocaleString("tr-TR")}`;
+      document.querySelector("#badge-employer-sgk").textContent = `SGK işveren %${(params.employerSgkRate * 100).toLocaleString("tr-TR")}`;
+      document.querySelector("#badge-employer-unemployment").textContent = `İşsizlik işveren %${(params.employerUnemploymentRate * 100).toLocaleString("tr-TR")}`;
+      document.querySelector("#badge-stamp").textContent = `Damga vergisi binde ${(params.stampRate * 1000).toLocaleString("tr-TR")}`;
+      document.querySelector("#badge-ceiling").textContent = `SGK tavan ${formatMoney(params.sgkCeiling).replace(" TL", "")} TL`;
+
+      document.querySelector("#primary-label").textContent = type === "net" ? "1. Ay Brüt Ücret" : "1. Ay Net Ücret";
+      document.querySelector("#primary-value").textContent = formatMoney(type === "net" ? first.gross : first.net);
+      document.querySelector("#monthly-cost").textContent = formatMoney(first.employerCost);
+      document.querySelector("#annual-cost").textContent = formatMoney(totals.employerCost);
+
+      document.querySelector("#monthly-lines").innerHTML = [
+        line("Brüt ücret", first.gross),
+        line("Net ücret", first.net),
+        line("SGK işçi primi", first.employeeSgk),
+        line("İşsizlik işçi primi", first.employeeUnemployment),
+        line("Gelir vergisi", first.incomeTax),
+        line("Damga vergisi", first.stampTax),
+        line("İşveren payı", first.employerShare),
+        line("1. ay işveren maliyeti", first.employerCost)
+      ].join("");
+
+      document.querySelector("#annual-lines").innerHTML = [
+        line("Yıllık brüt ücret", totals.gross),
+        line("Yıllık net ücret", totals.net),
+        line("Yıllık gelir vergisi", totals.incomeTax),
+        line("Yıllık damga vergisi", totals.stampTax),
+        line("Yıllık işveren payı", totals.employerShare),
+        line("Yıllık işveren maliyeti", totals.employerCost)
+      ].join("");
+
+      document.querySelector("#monthly-journal").textContent = buildMonthlyJournal(first);
+      document.querySelector("#annual-journal").textContent = buildAnnualJournal(totals);
+      document.querySelector("#salary-table").innerHTML = rows.map((row) => `
+        <tr>
+          <td>${row.month}</td>
+          <td>${formatMoney(row.gross)}</td>
+          <td>${formatMoney(row.net)}</td>
+          <td>${formatMoney(row.incomeTax)}</td>
+          <td>${formatMoney(row.stampTax)}</td>
+          <td>${formatMoney(row.employerShare)}</td>
+          <td>${formatMoney(row.employerCost)}</td>
+        </tr>
+      `).join("");
+
+      document.querySelector("#salary-totals").innerHTML = `
+        <tr>
+          <td>Toplam</td>
+          <td>${formatMoney(totals.gross)}</td>
+          <td>${formatMoney(totals.net)}</td>
+          <td>${formatMoney(totals.incomeTax)}</td>
+          <td>${formatMoney(totals.stampTax)}</td>
+          <td>${formatMoney(totals.employerShare)}</td>
+          <td>${formatMoney(totals.employerCost)}</td>
+        </tr>
+      `;
+    };
+
+    document.querySelector("#salary-form").addEventListener("submit", (event) => { event.preventDefault(); render(); });
+    document.querySelectorAll("input[name='salaryType']").forEach((input) => { input.addEventListener("change", render); });
+    document.querySelector("#amount").addEventListener("blur", (event) => {
+      const amount = parseMoney(event.target.value);
+      event.target.value = amount ? amount.toLocaleString("tr-TR") : "";
+    });
+    document.querySelector("#print-button").addEventListener("click", () => window.print());
+    document.querySelector("#excel-button").addEventListener("click", exportCsv);
+    render();
   </script>
 </body>
 </html>
