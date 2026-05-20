@@ -9,7 +9,8 @@ Türkiye bordro mevzuatına göre netten brüte ve brütten nete maaş hesaplama
 - SGK işçi, işsizlik işçi, SGK işveren ve işsizlik işveren payları hesaplanır.
 - SGK taban/tavan parametreleri dikkate alınır.
 - Aylık ve yıllık muhasebe kayıtları gösterilir.
-- 2027 ve sonraki yıllar için vergi/SGK parametreleri arayüzden değiştirilebilir.
+- PDF/yazdır çıktısı alınabilir.
+- Excel'de açılabilen CSV çıktısı indirilebilir.
 
 ## GitHub Pages ile Yayınlama
 
@@ -30,6 +31,10 @@ Sonra tarayıcıda açın:
 ```text
 http://localhost:4173
 ```
+
+## Güncelleme
+
+Yeni yıl asgari ücret, SGK taban/tavan ve gelir vergisi dilimleri belli olduğunda uygulama parametreleri koddan güncellenir.
 
 ## Not
 
